@@ -118,7 +118,7 @@
                         } else {
                             Text("Refresh Page")
                                 .font(.system(size: 20, weight: .medium))
-                                .foregroundStyle(.white)
+                                .foregroundColor(.white)
                         }
                     }
 
