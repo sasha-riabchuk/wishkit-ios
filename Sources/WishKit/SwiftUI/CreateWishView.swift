@@ -274,11 +274,11 @@ struct CreateWishView: View {
                 case .success:
                     alertModel.alertReason = .successfullyCreated
                     alertModel.showAlert = true
-                    (closeAction ?? {})()
+                    closeActionIOS()
                 case .failure(let error):
                     alertModel.alertReason = .createReturnedError(error.reason.description)
                     alertModel.showAlert = true
-                    (closeAction ?? {})()
+                    closeActionIOS()
                 }
             }
         }
