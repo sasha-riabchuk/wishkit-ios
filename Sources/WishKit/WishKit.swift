@@ -7,15 +7,14 @@
 //
 
 #if canImport(UIKit)
-import UIKit
+    import UIKit
 #endif
 
+import Combine
 import SwiftUI
 import WishKitShared
-import Combine
 
-public struct WishKit {
-    
+public enum WishKit {
     private static var subscribers: Set<AnyCancellable> = []
 
     static var apiKey = "my-fancy-api-key"
@@ -27,18 +26,27 @@ public struct WishKit {
     public static var config = Configuration()
 
     #if canImport(UIKit) && !os(visionOS)
-    /// (UIKit) The WishList viewcontroller.
-    public static var viewController: UIViewController {
-        UIHostingController(rootView: WishlistViewIOS(wishModel: WishModel()))
-    }
+        /// (UIKit) The WishList viewcontroller.
+        public static var viewController: UIViewController {
+            UIHostingController(rootView: WishlistViewIOS(closeAction: {}, wishModel: WishModel()))
+        }
     #endif
-    
+
     /// (SwiftUI) The WishList view.
+
+    public static func view(closeAction: @escaping () -> Void) -> some View {
+        #if os(macOS) || os(visionOS)
+            return WishlistContainer(wishModel: WishModel())
+        #else
+            return WishlistViewIOS(closeAction: closeAction, wishModel: WishModel())
+        #endif
+    }
+
     public static var view: some View {
         #if os(macOS) || os(visionOS)
             return WishlistContainer(wishModel: WishModel())
         #else
-            return WishlistViewIOS(wishModel: WishModel())
+        return WishlistViewIOS(closeAction: {}, wishModel: WishModel())
         #endif
     }
 
@@ -64,7 +72,6 @@ class RoundUp: NSDecimalNumberBehaviors {
 }
 
 public struct Payment {
-
     let amount: Int
 
     // MARK: - Weekly
@@ -95,31 +102,31 @@ public struct Payment {
 
 // MARK: - Update User Logic
 
-extension WishKit {
-    public static func updateUser(customID: String) {
-        self.user.customID = customID
+public extension WishKit {
+    static func updateUser(customID: String) {
+        user.customID = customID
         sendUserToBackend()
     }
 
-    public static func updateUser(email: String) {
-        self.user.email = email
+    static func updateUser(email: String) {
+        user.email = email
         sendUserToBackend()
     }
 
-    public static func updateUser(name: String) {
-        self.user.name = name
+    static func updateUser(name: String) {
+        user.name = name
         sendUserToBackend()
     }
 
-    public static func updateUser(payment: Payment) {
-        self.user.payment = payment
+    static func updateUser(payment: Payment) {
+        user.payment = payment
         sendUserToBackend()
     }
 
-    static func sendUserToBackend() {
+    internal static func sendUserToBackend() {
         Task {
             let request = user.createRequest()
-            let _ = await UserApi.updateUser(userRequest: request)
+            _ = await UserApi.updateUser(userRequest: request)
         }
     }
 }

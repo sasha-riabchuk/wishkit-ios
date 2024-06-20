@@ -23,6 +23,8 @@ extension View {
 }
 
 struct WishlistViewIOS: View {
+    
+    public var closeAction: () -> Void
 
     @Environment(\.colorScheme)
     private var colorScheme
@@ -75,6 +77,11 @@ struct WishlistViewIOS: View {
         default:
             return []
         }
+    }
+    
+    init(closeAction: @escaping () -> Void, wishModel: WishModel) {
+        self.closeAction = closeAction
+        self.wishModel = wishModel
     }
 
     var body: some View {
@@ -130,7 +137,7 @@ struct WishlistViewIOS: View {
                         if WishKit.config.buttons.addButton.display == .show {
                             NavigationLink(
                                 destination: {
-                                    CreateWishView(createActionCompletion: { wishModel.fetchList() })
+                                    CreateWishView(closeActionIOS: closeAction, createActionCompletion: { wishModel.fetchList() })
                                 }, label: {
                                     AddButton(size: CGSize(width: 60, height: 60))
                                 }

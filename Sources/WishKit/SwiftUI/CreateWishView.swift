@@ -43,7 +43,9 @@ struct CreateWishView: View {
     private var showConfirmationAlert = false
 
     let createActionCompletion: () -> Void
-
+    
+    var closeActionIOS: () -> Void
+    
     var closeAction: (() -> Void)? = nil
 
     var saveButtonSize: CGSize {
@@ -53,7 +55,12 @@ struct CreateWishView: View {
             return CGSize(width: 200, height: 45)
         #endif
     }
-
+    
+    init(closeActionIOS: @escaping () -> Void, createActionCompletion: @escaping () -> Void) {
+        self.closeActionIOS = closeActionIOS
+        self.createActionCompletion = createActionCompletion
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             if showCloseButton() {
@@ -292,6 +299,7 @@ struct CreateWishView: View {
     }
 
     private func dismissAction() {
+        closeActionIOS()
         presentationMode.wrappedValue.dismiss()
     }
 }
